@@ -79,6 +79,7 @@ function onModeClick() {
 
 function onCanvasClick() {
   if (isFilling) {
+    canvas.style.cursor = `url(${fillCursor}), auto`;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 }
