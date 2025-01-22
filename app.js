@@ -1,3 +1,10 @@
+const fillCursor = "cursor/bucket.cur";
+const drawCursor = "cursor/brush.cur";
+const eraserCursor = "cursor/eraser.cur";
+const strokeMode = document.getElementById("stroke-mode");
+const fontFamily = document.getElementById("Font-family");
+const fontSize = document.getElementById("font-size");
+const fontWeight = document.getElementById("font-weight");
 const saveBtn = document.getElementById("save");
 const textInput = document.getElementById("text");
 const fileInput = document.getElementById("file");
@@ -48,6 +55,7 @@ function onLineWidthChange(event) {
 function onColorChange(event) {
   ctx.strokeStyle = event.target.value;
   ctx.fillStyle = event.target.value;
+  canvas.style.cursor = `url(${drawCursor}), auto`;
 }
 
 function onColorClick(event) {
@@ -60,10 +68,12 @@ function onColorClick(event) {
 function onModeClick() {
   if (isFilling) {
     isFilling = false;
-    modeBtn.innerText = "채우기";
+    modeBtn.innerText = "배경 채우기";
+    canvas.style.cursor = `url(${drawCursor}), auto`;
   } else {
     isFilling = true;
     modeBtn.innerText = "그리기";
+    canvas.style.cursor = `url(${fillCursor}), auto`;
   }
 }
 
@@ -80,9 +90,9 @@ function onDeleteClick() {
 
 function onEraserClick() {
   ctx.strokeStyle = "white";
-  ctx.lineWidth = 30;
   isFilling = false;
-  modeBtn.innerText = "채우기";
+  modeBtn.innerText = "배경 채우기";
+  canvas.style.cursor = `url(${eraserCursor}), auto`;
 }
 
 function onFileChange(event) {
@@ -96,13 +106,24 @@ function onFileChange(event) {
   };
 }
 
+function updateFont() {
+  const selectedFontFamily = fontFamily.value;
+  const selectedFontSize = fontSize.value;
+  const selectedFontWeight = fontWeight.value;
+  ctx.font = `${selectedFontWeight} ${selectedFontSize}px ${selectedFontFamily}`;
+}
+
 function onDoubleClick(event) {
   const text = textInput.value;
   if (text !== "") {
     ctx.save();
     ctx.lineWidth = 1;
-    ctx.font = "30px serif";
-    ctx.fillText(text, event.offsetX, event.offsetY);
+    updateFont();
+    if (strokeMode.checked) {
+      ctx.strokeText(text, event.offsetX, event.offsetY);
+    } else {
+      ctx.fillText(text, event.offsetX, event.offsetY);
+    }
     ctx.restore();
   }
 }
@@ -113,6 +134,10 @@ function onSaveClick() {
   a.href = url;
   a.download = "myDrawing.png";
   a.click();
+}
+
+function onFontFamilyChange() {
+  ctx.font = "";
 }
 
 canvas.addEventListener("dblclick", onDoubleClick);
@@ -132,3 +157,6 @@ deleteBtn.addEventListener("click", onDeleteClick);
 eraserBtn.addEventListener("click", onEraserClick);
 fileInput.addEventListener("change", onFileChange);
 saveBtn.addEventListener("click", onSaveClick);
+fontFamily.addEventListener("change", updateFont);
+fontSize.addEventListener("input", updateFont);
+fontWeight.addEventListener("change", updateFont);
